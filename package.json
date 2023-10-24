@@ -1,0 +1,35 @@
+{
+  "name": "hsc_finalproject_jogja_api",
+  "version": "0.0.1",
+  "description": "jogja tourism api",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nadila98dev/HSC_FinalProjects_Jogja_Backend.git"
+  },
+  "keywords": [
+    "jogja",
+    "api",
+    "tourism",
+    "backend",
+    "travel",
+    "api"
+  ],
+  "author": "Kelompok 8 HSC Batch 8",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nadila98dev/HSC_FinalProjects_Jogja_Backend/issues"
+  },
+  "homepage": "https://github.com/nadila98dev/HSC_FinalProjects_Jogja_Backend#readme",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
