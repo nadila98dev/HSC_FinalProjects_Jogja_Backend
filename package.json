@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node src/index.js"
+    "dev": "node src/index.js",
+    "start": "nodemon src/index.js"
   },
   "repository": {
     "type": "git",
@@ -26,10 +27,15 @@
   },
   "homepage": "https://github.com/nadila98dev/HSC_FinalProjects_Jogja_Backend#readme",
   "dependencies": {
+    "@prisma/client": "^5.5.2",
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.3.1",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "http-status-codes": "^2.3.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "prisma": "^5.5.2"
   }
 }
