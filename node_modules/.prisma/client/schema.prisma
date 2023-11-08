@@ -21,6 +21,19 @@ model User {
   updated_at DateTime @updatedAt
 }
 
+model Items {
+  id               String   @id @default(uuid())
+  id_category      String   @unique
+  name             String
+  slug             String
+  src              String?
+  price            Int
+  address          String
+  description      String
+}
+
+
+
 enum Role {
   USER
   ADMIN

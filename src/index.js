@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 require('dotenv').config()
+const itemRoute = require('./routes/Items_route')
 
 
 const port = process.env.SERVER_PORT || 3000
@@ -10,7 +11,7 @@ const authRouter = require('./app/auth/router')
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
+app.use(itemRoute);
 // Version
 const version = '/api/v1'
 
