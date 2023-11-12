@@ -22,16 +22,24 @@ model User {
 }
 
 model Items {
-  id               String   @id @default(uuid())
-  id_category      String   @unique
-  name             String
-  slug             String
-  src              String?
-  price            Int
-  address          String
-  description      String
+  id           Int      @id @default(autoincrement())
+  id_category  Int   
+  name         String
+  slug         String
+  src          String?
+  price        Int
+  address      String
+  position     Position @relation(fields: [positionId], references: [id])
+  description  String  @db.VarChar(255)
+  positionId   Int
 }
 
+model Position {
+  id    Int    @id @default(autoincrement())
+  lat   Float
+  lng   Float
+  items Items[]
+}
 
 
 enum Role {

@@ -11,7 +11,7 @@ const authRouter = require('./app/auth/router')
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(itemRoute);
+
 // Version
 const version = '/api/v1'
 
@@ -20,7 +20,7 @@ const version = '/api/v1'
 // })
 
 app.use(`${version}/auth`, authRouter)
-
+app.use('/items',itemRoute)
 app.listen(port, () => {
   console.log(`Server running in http://localhost:${port}`)
 })
