@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 require('dotenv').config()
+const itemRoute = require('./routes/Items_route')
 
 
 const port = process.env.SERVER_PORT || 3000
@@ -19,7 +20,7 @@ const version = '/api/v1'
 // })
 
 app.use(`${version}/auth`, authRouter)
-
+app.use('/items',itemRoute)
 app.listen(port, () => {
   console.log(`Server running in http://localhost:${port}`)
 })

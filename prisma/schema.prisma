@@ -21,6 +21,27 @@ model User {
   updated_at DateTime @updatedAt
 }
 
+model Items {
+  id           Int      @id @default(autoincrement())
+  id_category  Int   
+  name         String
+  slug         String
+  src          String?
+  price        Int
+  address      String
+  position     Position @relation(fields: [positionId], references: [id])
+  description  String  @db.VarChar(255)
+  positionId   Int
+}
+
+model Position {
+  id    Int    @id @default(autoincrement())
+  lat   Float
+  lng   Float
+  items Items[]
+}
+
+
 enum Role {
   USER
   ADMIN
