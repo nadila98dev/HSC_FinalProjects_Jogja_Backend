@@ -19,6 +19,23 @@ model User {
   role       Role     @default(USER)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+
+  //relation
+  account     Account[]
+}
+
+// ================= Account ==================
+
+model Account {
+  id           Int @id @default(autoincrement())
+  userId       String
+  address      String
+  username     String
+  telephone    String
+
+  // relation
+  user         User @relation(fields: [userId], references: [id] )
+  orderDetails OrderDetail[]  
 }
 
 model Items {
@@ -32,6 +49,9 @@ model Items {
   position     Position @relation(fields: [positionId], references: [id])
   description  String  @db.VarChar(255)
   positionId   Int
+
+  //relation
+  cart         Cart[]
 }
 
 model Position {
@@ -45,4 +65,44 @@ model Position {
 enum Role {
   USER
   ADMIN
+}
+
+// ==================== cart =================== // 
+
+model Cart {
+  id              Int @id @default(autoincrement())
+  itemsId         Int
+  quantity        Int
+  totalprice      Int
+  createdAt       DateTime @default(now())
+
+  //relations
+  item            Items @relation(fields: [itemsId], references: [id])
+  orders          OrderCart[]
+  orderDetails    OrderDetail[]
+}
+
+// ==================== Order and Transaction ==================== //
+
+model OrderCart {
+  id              Int @id @default(autoincrement())
+  cartId          Int
+  shipment_status String
+  createdAt       DateTime @default(now())
+
+  //relations
+  cart            Cart @relation(fields: [cartId], references: [id])
+  orderDetails    OrderDetail[]
+}
+
+model OrderDetail {
+  id              Int @id @default(autoincrement())
+  cartId          Int
+  orderId         Int
+  accountId       Int
+
+  //relations
+  cart            Cart @relation(fields: [cartId], references: [id])
+  orders          OrderCart @relation(fields: [orderId], references: [id])
+  account         Account @relation(fields: [accountId], references: [id])
 }
