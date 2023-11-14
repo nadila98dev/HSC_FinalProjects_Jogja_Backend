@@ -1,17 +1,21 @@
-const { PrismaClient } = require("@prisma/client")
+const { PrismaClient } = require("@prisma/client");
+const { response } = require("express");
 
 const prisma = new PrismaClient();
 
+
+// GET METHOD
  const getAllItems = async (req, res) => {
     try{
         const response = await prisma.items.findMany()
-        res.status(200).json(response)
-    }catch(er){
-        res.status(500).json({message: err.message})
+        res.status(200).json({success: true, message: "Items retrieved sucessfully", data: response})
+    }catch(err){
+        res.status(500).json({success: false, message: `Failed to retrieve items: ${err.message}`})
     }
 
 }
 
+// GET METHOD (SPECIFIC BY ID)
  const getItembyId = async (req, res) => {
     const itemId = Number(req.params.id)
     try{
@@ -27,13 +31,15 @@ const prisma = new PrismaClient();
         }
 
 
-        res.status(200).json(response)
+        res.status(200).json({success: true, message:"Item by ID is retrieve sucessfully", data: response})
     }catch(err){
-        res.status(404).json({message: err.message})
+        res.status(404).json({success: false, message: `Failed to retrieve item: ${err.message}`})
     }
 
 }
 
+
+// POST METHOD
 const createItem = async (req, res) => {
     const body = req.body;
     try {
@@ -54,17 +60,20 @@ const createItem = async (req, res) => {
                 },
             },
         });
-        res.status(201).json(items);
-    } catch (error) {
-        res.status(401).json({ message: error.message });
+        res.status(201).json({success: true, message: "Item has been created sucessfully", data: response});
+    } catch (err) {
+        res.status(401).json({ success: false, message: `Failed to create item: ${err.message}` });
     }
 }
 
 
+// PUT METHOD
  const updateItem = async (req, res) => {
     const body = req.body
-    const itemId = Number(req.params.id)
     try{
+        const itemId = Number(req.params.id)
+
+         // Fetch the item to get its associated id and update based on the field associated with id
         const updatedItem = await prisma.items.update({
             where: {
                 id: itemId,
@@ -74,15 +83,17 @@ const createItem = async (req, res) => {
                 position: true
             },
         })
-        res.status(200).json(updatedItem)
+        res.status(200).json({success: true, message: "Item has been successfully updated", data: updatedItem})
 
-    }catch(er){
-        res.status(400).json({message: err.message})
+    }catch(err){
+        res.status(400).json({success: false, message: `Failed to update item: ${err.message}`})
 
     }
 
 } 
 
+
+// DELETE METHOD
 const deleteItem = async (req, res) => {
     try {
         const itemId = Number(req.params.id);
@@ -117,9 +128,9 @@ const deleteItem = async (req, res) => {
             });
         }
 
-        res.status(200).json(deletedItem);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(200).json({success: true, message: "Item has been deleted", data: deletedItem});
+    } catch (err) {
+        res.status(400).json({ success: false, message: `Failed to delete item: ${err.message}` });
     }
 }
 
