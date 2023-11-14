@@ -38,6 +38,8 @@ model Account {
   orderDetails OrderDetail[]  
 }
 
+// ==================== Items =================== // 
+
 model Items {
   id           Int      @id @default(autoincrement())
   id_category  Int   
