@@ -13,66 +13,57 @@ datasource db {
 model User {
   id         String   @id @default(uuid())
   email      String   @unique
+  username   String
   name       String
   password   String
   avatar     String?
+  address      String?
+  phone        String?
   role       Role     @default(USER)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
   //relation
-  account     Account[]
+
+  orderCart   OrderCart[]
+  cart        Cart[]
 }
 
-// ================= Account ==================
 
-model Account {
-  id           Int @id @default(autoincrement())
-  userId       String
-  address      String
-  username     String
-  telephone    String
 
-  // relation
-  user         User @relation(fields: [userId], references: [id] )
-  orderDetails OrderDetail[]  
+model Category {
+  id        String @id @default(nanoid(3))
+  name      String
+  slug      String
+  image     String?
+  items     Items[]
 }
 
 // ==================== Items =================== // 
 
 model Items {
   id           Int      @id @default(autoincrement())
-  id_category  Int   
+  id_category  String   
   name         String
   slug         String
   src          String?
   price        Int
-  address      String
-  position     Position @relation(fields: [positionId], references: [id])
-  description  String  @db.VarChar(255)
-  positionId   Int
+  address      String?
+  positionlat  Float?
+  positionlng  Float?
+  description  String  
 
   //relation
   cart         Cart[]
+  category      Category @relation(fields: [id_category], references: [id])
 }
 
-model Position {
-  id    Int    @id @default(autoincrement())
-  lat   Float
-  lng   Float
-  items Items[]
-}
-
-
-enum Role {
-  USER
-  ADMIN
-}
 
 // ==================== cart =================== // 
 
 model Cart {
   id              Int @id @default(autoincrement())
+  userId       String
   itemsId         Int
   quantity        Int
   totalprice      Int
@@ -80,31 +71,29 @@ model Cart {
 
   //relations
   item            Items @relation(fields: [itemsId], references: [id])
+  
   orders          OrderCart[]
-  orderDetails    OrderDetail[]
+  user         User @relation(fields: [userId], references: [id] )
+
 }
 
 // ==================== Order and Transaction ==================== //
 
 model OrderCart {
   id              Int @id @default(autoincrement())
+  userId       String
   cartId          Int
   shipment_status String
   createdAt       DateTime @default(now())
 
   //relations
   cart            Cart @relation(fields: [cartId], references: [id])
-  orderDetails    OrderDetail[]
+  user            User @relation(fields: [userId], references: [id])
+ 
 }
 
-model OrderDetail {
-  id              Int @id @default(autoincrement())
-  cartId          Int
-  orderId         Int
-  accountId       Int
-
-  //relations
-  cart            Cart @relation(fields: [cartId], references: [id])
-  orders          OrderCart @relation(fields: [orderId], references: [id])
-  account         Account @relation(fields: [accountId], references: [id])
+enum Role {
+  USER
+  ADMIN
 }
+
