@@ -1,8 +1,21 @@
 const { PrismaClient } = require("@prisma/client")
 const { response } = require("express")
+const multer = require('multer')
+const path = require('path')
 
 const prisma = new PrismaClient()
 
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.filename + '-' + Date.name() + path.extname(file.originalname))
+    },
+})
+
+// Create Multer instance with storage configuration
+const upload = multer({storage: storage})
 
 // GET METHOD
  const getAllItems = async (req, res) => {
@@ -41,14 +54,22 @@ const prisma = new PrismaClient()
 
 // POST METHOD
 const createItem = async (req, res) => {
-    const body = req.body
+
     try {
+
+        upload.single('src')(req, res, async (err) => {
+            if(err) {
+                return res.status(400).json({ success: false, message: `Failed to upload file: ${err.message}` })
+            }
+        })
+
+        const body = req.body
             const createdItem = await prisma.items.create({
                 data: {
                     id_category: body.id_category,
                     name: body.name,
                     slug: body.slug,
-                    src: body.src,
+                    src: req.file.filename,
                     price: body.price,
                     address: body.address,
                     positionlat: body.positionlat,
