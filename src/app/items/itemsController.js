@@ -1,7 +1,7 @@
-const { PrismaClient } = require("@prisma/client");
-const { response } = require("express");
+const { PrismaClient } = require("@prisma/client")
+const { response } = require("express")
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 
 // GET METHOD
@@ -17,7 +17,7 @@ const prisma = new PrismaClient();
 
 // GET METHOD (SPECIFIC BY ID)
  const getItembyId = async (req, res) => {
-    const itemId = Number(req.params.id)
+    const itemId = req.params.id
     try{
         const response = await prisma.items.findUnique({
             where:{
@@ -27,7 +27,7 @@ const prisma = new PrismaClient();
 
         if(!response) {
             res.status(404).json({message: "Item ID is not found"})
-            return;
+            return
         }
 
 
@@ -41,28 +41,24 @@ const prisma = new PrismaClient();
 
 // POST METHOD
 const createItem = async (req, res) => {
-    const body = req.body;
+    const body = req.body
     try {
-        const items = await prisma.items.create({
-            data: {
-                id_category: body.id_category,
-                name: body.name,
-                slug: body.slug,
-                src: body.src,
-                price: body.price,
-                address: body.address,
-                description: body.description,
-                position: {
-                    create: {
-                        lat: body.position.lat,
-                        lng: body.position.lng,
-                    },
-                },
-            },
-        });
-        res.status(201).json({success: true, message: "Item has been created sucessfully", data: items});
+            const createdItem = await prisma.items.create({
+                data: {
+                    id_category: body.id_category,
+                    name: body.name,
+                    slug: body.slug,
+                    src: body.src,
+                    price: body.price,
+                    address: body.address,
+                    positionlat: body.positionlat,
+                    positionlng: body.positionlng,
+                    description: body.description
+                }
+            })
+        res.status(201).json({success: true, message: "Item has been created sucessfully", data: createdItem})
     } catch (err) {
-        res.status(401).json({ success: false, message: `Failed to create item: ${err.message}` });
+        res.status(401).json({ success: false, message: `Failed to create item: ${err.message}` })
     }
 }
 
@@ -70,19 +66,25 @@ const createItem = async (req, res) => {
 // PUT METHOD
  const updateItem = async (req, res) => {
     const body = req.body
+    const itemId = req.params.id
     try{
-        const itemId = Number(req.params.id)
+        const existingItem = await prisma.items.findUnique({
+            where: {
+                id: itemId,
+            },
+        })
 
-         // Fetch the item to get its associated id and update based on the field associated with id
+        if(!existingItem) {
+            return res.status(404).json({ success: false, message: "Item not found" })
+        }
+
         const updatedItem = await prisma.items.update({
             where: {
                 id: itemId,
             },
             data: body,
-            include: {
-                position: true
-            },
         })
+        
         res.status(200).json({success: true, message: "Item has been successfully updated", data: updatedItem})
 
     }catch(err){
@@ -95,42 +97,29 @@ const createItem = async (req, res) => {
 
 // DELETE METHOD
 const deleteItem = async (req, res) => {
+    const itemId = req.params.id
     try {
-        const itemId = Number(req.params.id);
 
-        // Fetch the item to get its associated position
-        const item = await prisma.items.findUnique({
+        const exisitingItem = await prisma.items.findUnique({
             where: {
-                id: itemId,
+                id: itemId
             },
-            include: {
-                position: true,
-            },
-        });
+        })
 
-        if (!item) {
-            throw new Error("Item not found");
+        if(!exisitingItem) {
+            return res.status(404).json({ success: false, message: "Item not found" })
         }
 
-        // Delete the item
         const deletedItem = await prisma.items.delete({
             where: {
                 id: itemId,
             },
-        });
+        })
+        
 
-        // Delete the associated position if it exists
-        if (item.position) {
-            await prisma.position.delete({
-                where: {
-                    id: item.position.id,
-                },
-            });
-        }
-
-        res.status(200).json({success: true, message: "Item has been deleted", data: deletedItem});
+        res.status(200).json({success: true, message: "Item has been deleted", data: deletedItem})
     } catch (err) {
-        res.status(400).json({ success: false, message: `Failed to delete item: ${err.message}` });
+        res.status(400).json({ success: false, message: `Failed to delete item: ${err.message}` })
     }
 }
 
