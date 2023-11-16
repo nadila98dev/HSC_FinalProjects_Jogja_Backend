@@ -11,12 +11,12 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  email      String   @unique
-  username   String
-  name       String
-  password   String
-  avatar     String?
+  id           String   @id @default(uuid())
+  email        String   @unique
+  username     String
+  name         String
+  password     String
+  avatar       String?
   address      String?
   phone        String?
   role       Role     @default(USER)
@@ -30,9 +30,11 @@ model User {
 }
 
 
+// ==================== Category =================== // 
+
 
 model Category {
-  id        String @id @default(nanoid(3))
+   id       Int      @id @default(autoincrement())
   name      String
   slug      String
   image     String?
@@ -42,8 +44,8 @@ model Category {
 // ==================== Items =================== // 
 
 model Items {
-  id           Int      @id @default(autoincrement())
-  id_category  String   
+  id           String      @id @default(nanoid(2))
+  id_category  Int   
   name         String
   slug         String
   src          String?
@@ -62,9 +64,9 @@ model Items {
 // ==================== cart =================== // 
 
 model Cart {
-  id              Int @id @default(autoincrement())
-  userId       String
-  itemsId         Int
+  id              String  @id @default(nanoid(3))
+  userId          String
+  itemsId         String
   quantity        Int
   totalprice      Int
   createdAt       DateTime @default(now())
@@ -80,9 +82,9 @@ model Cart {
 // ==================== Order and Transaction ==================== //
 
 model OrderCart {
-  id              Int @id @default(autoincrement())
-  userId       String
-  cartId          Int
+  id              String @id @default(nanoid(3))
+  userId          String
+  cartId          String
   shipment_status String
   createdAt       DateTime @default(now())
 
