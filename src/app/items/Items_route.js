@@ -9,9 +9,9 @@ router.get('/', getAllItems)
 
 router.get('/:id', getItembyId)
 
-router.post('', upload.single('image'), authenticateAdmin, createItem)
+router.post('/', upload.single('image'), createItem)
 
-router.put('/:id', upload.single('image'), authenticateAdmin, updateItem)
+router.put('/:id', upload.single('image'),  updateItem)
 
 router.delete('/:id', deleteItem);
 

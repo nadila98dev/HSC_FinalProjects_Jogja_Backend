@@ -46,7 +46,7 @@ model Items {
   id_category Int
   name        String
   slug        String
-  src         String?
+  image         String?
   price       Int
   address     String?
   positionlat Float?

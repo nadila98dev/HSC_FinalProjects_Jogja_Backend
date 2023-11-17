@@ -11,7 +11,7 @@ const getallCategory = async (req, res) => {
   try {
     const response = await prisma.category.findMany();
     res
-      .status(StatusCode.OK)
+      .status(StatusCodes.OK)
       .json({
         success: true,
         message: "All categories successfully retrieved",
@@ -105,24 +105,26 @@ const updateCategory = async (req, res) => {
       },
     });
 
+    
     if (!findCategory) {
-      res.status(StatusCodes.NOT_FOUND).json({
+      return res.status(StatusCodes.NOT_FOUND).json({
         success: false,
         message: "Category Not Found",
       });
     }
 
-    if (req.file && findCategory.image !== "/images/avatar/default.jpg") {
+    if (req.file && findCategory.image && findCategory.image !== "/images/avatar/default.jpg") {
       const oldImage = "public" + findCategory.image;
-
+    
       fs.unlink(oldImage, (err) => {
         if (err) {
-          console.error("Gagal menghapus gambar lama:", err);
+          console.error("Failed to delete the old image:", err);
         } else {
-          console.log("Success");
+          console.log("Old image deleted successfully");
         }
       });
     }
+    
 
     const updatedCategory = await prisma.category.update({
       where: {
@@ -137,8 +139,7 @@ const updateCategory = async (req, res) => {
         items: true,
       },
     });
-    res
-      .status(StatusCodes.OK)
+    res.status(StatusCodes.OK)
       .json({
         success: true,
         message: "Categories has been successfully updated",
