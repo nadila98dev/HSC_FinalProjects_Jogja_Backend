@@ -36,5 +36,47 @@ const authenticateUser = (req, res, next) =>{
     }
 }
 
+const authenticateAdmin = (req, res, next) =>{
+    try {
+        let token;
 
-module.exports = { authenticateUser }
+        const authHeader = req.headers.authorization
+        if(authHeader && authHeader.startsWith("Bearer")){
+            token = authHeader.split(" ")[1]
+        }
+
+        if(!token){
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                error: true,
+                message: 'Authenticated Failed'
+            })
+        }
+
+        const payload = jwtVerify({token})
+
+        if(payload.role !== 'ADMIN'){
+            return res.status(StatusCodes.FORBIDDEN).json({
+                error: true,
+                message: 'FORBIDDEN'
+            })
+        }
+
+        console.log(payload)
+       
+
+        req.user = {
+            email: payload.email,
+            id: payload.id,
+            role: payload.role,
+        }
+        console.log(req.user)
+
+        next()
+
+    } catch (err) {
+        next(err)
+    }
+}
+
+
+module.exports = { authenticateUser, authenticateAdmin }
