@@ -1,28 +1,18 @@
 const express = require('express')
-const multer = require('multer')
 const { getAllItems, getItembyId, createItem, updateItem, deleteItem } = require('./itemsController')
+const upload = require('../../middlewares/multer')
+const { authenticateAdmin } = require('../../middlewares/auth')
 
 const router = express.Router()
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-    }
-})
+router.get('/', getAllItems)
 
-const upload = multer({storage: storage})
+router.get('/:id', getItembyId)
 
-router.get('/api/v1/all', getAllItems)
+router.post('', upload.single('image'), authenticateAdmin, createItem)
 
-router.get('/api/v1/itembyid/:id', getItembyId)
+router.put('/:id', upload.single('image'), authenticateAdmin, updateItem)
 
-router.post('/api/v1/create', upload.single('src'), createItem)
-
-router.put('/api/v1/update/:id', updateItem)
-
-router.delete('/api/v1/delete/:id', deleteItem);
+router.delete('/:id', deleteItem);
 
 module.exports = router

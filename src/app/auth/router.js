@@ -1,11 +1,11 @@
 const express = require('express')
-const { signup, signin } = require('./controller')
+const { signup, signin, detailUser } = require('./controller');
+const { authenticateUser } = require('../../middlewares/auth');
 const router =  express.Router();
 
-router.get('/signup', (req, res) => {
-    res.send('APa Kabar')
-})
+
 router.post('/signin', signin)
 router.post('/signup', signup)
+router.get('/detail', authenticateUser, detailUser)
 
 module.exports = router
