@@ -30,10 +30,10 @@ app.use(`${version}/auth`, authRouter);
 app.use(`${version}/categories`, categoryRouter);
 
 // items
-app.use('/items', itemRoute);
+app.use(`${version}/items`, itemRoute);
 
 //cart
-app.use('/cart', cartRoute);
+app.use(`${version}/cart`, cartRoute);
 
 //transaction
 app.use(`${version}/orders`, orderRouter);

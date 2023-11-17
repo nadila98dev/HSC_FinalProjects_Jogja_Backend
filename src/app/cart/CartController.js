@@ -1,9 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
 const { response } = require('express');
+const { StatusCodes } = require("http-status-codes");
 
 const prisma = new PrismaClient();
 
-export const getCarts = async (req, res) => {
+ const getCarts = async (req, res) => {
   try {
     const response = await prisma.cart.findMany({
       where: { userId: req.user.id },
@@ -12,13 +13,14 @@ export const getCarts = async (req, res) => {
         user: true,
       },
     });
-    res.status(200).json(response);
+    res.status(StatusCodes.OK).json(response);
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+      msg: error.message });
   }
 };
 
-export const createCarts = async (req, res) => {
+ const createCarts = async (req, res) => {
   try {
     const { userId, itemsId, quantity, totalprice } = req.body;
 
@@ -37,13 +39,14 @@ export const createCarts = async (req, res) => {
       },
     });
 
-    res.json(cart).status(201);
+    res.json(cart).status(StatusCodes.CREATED);
   } catch (error) {
-    res.status(400).json({ msg: error.message });
+    res.status(StatusCodes.BAD_REQUEST).json({ 
+      msg: error.message });
   }
 };
 
-export const deleteCarts = async (req, res) => {
+const deleteCarts = async (req, res) => {
   try {
     const cartId = parseInt(req.params.id);
 
@@ -57,8 +60,10 @@ export const deleteCarts = async (req, res) => {
       },
     });
 
-    res.status(200).json(cart);
+    res.status(StatusCodes.OK).json(cart);
   } catch (error) {
-    res.status(400).json({ msg: error.message });
+    res.status(StatusCodes.BAD_REQUEST).json({ msg: error.message });
   }
 };
+
+module.exports = {getCarts, createCarts, deleteCarts}

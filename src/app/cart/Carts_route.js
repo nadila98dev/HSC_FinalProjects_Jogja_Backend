@@ -3,10 +3,10 @@ const { getCarts, createCarts, deleteCarts } = require('./CartController');
 
 const router = express.Router();
 
-router.get('/api/v1/carts', getCarts);
+router.get('/', getCarts);
 
-router.post('/api/v1/create', createCarts);
+router.post('/', createCarts);
 
-router.delete('/api/v1/delete/:id', deleteCarts);
+router.delete('/:id', deleteCarts);
 
 module.exports = router;

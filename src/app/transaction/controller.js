@@ -1,5 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
+const { STATUS_CODES } = require("http");
 const prisma = new PrismaClient();
+const { StatusCodes } = require("http-status-codes");
 
 const createOrder = async (req, res) => {
   const { cartId } = req.body;
@@ -8,14 +10,17 @@ const createOrder = async (req, res) => {
   try {
     if (!cartId) {
       return res
-        .status(400)
-        .json({ success: false, error: "cartId is required" });
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ success: false, 
+          error: "cartId is required" });
     }
 
     if (!userId) {
       return res
-        .status(400)
-        .json({ success: false, error: "cartId is required" });
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ 
+          success: false, 
+          error: "cartId is required" });
     }
 
     const existingCart = await prisma.cart.findUnique({
@@ -32,7 +37,9 @@ const createOrder = async (req, res) => {
     });
 
     if (!existingCart) {
-      return res.status(404).json({ success: false, error: "Cart not found" });
+      return res.status(StatusCodes.NOT_FOUND).json({ 
+        success: false, 
+        error: "Cart not found" });
     }
 
     const newOrder = await prisma.orderCart.create({
@@ -50,10 +57,12 @@ const createOrder = async (req, res) => {
       });
     }, 5 * 60 * 1000);
 
-    res.status(201).json({ success: true, order: newOrder });
+    res.status(StatusCodes.CREATED).json({ success: true, order: newOrder });
   } catch (error) {
     console.error("Error creating an order:", error);
-    res.status(500).json({ success: false, error: "Internal Server Error" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+      success: false, 
+      error: "Internal Server Error" });
   }
 };
 
@@ -76,10 +85,12 @@ const getAllOrders = async (req, res) => {
       },
     });
 
-    res.status(200).json({ success: true, orders });
+    res.status(StatusCodes.OK).json({ success: true, orders });
   } catch (error) {
     console.error("Error getting orders:", error);
-    res.status(500).json({ success: false, error: "Internal Server Error" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+      success: false, 
+      error: "Internal Server Error" });
   }
 };
 
@@ -105,13 +116,19 @@ const getOrderDetails = async (req, res) => {
     });
 
     if (!orderDetails) {
-      return res.status(404).json({ success: false, error: "Order not found" });
+      return res.status(StatusCodes.NOT_FOUND).json({ 
+        success: false, 
+        error: "Order not found" });
     }
 
-    res.status(200).json({ success: true, orderDetails });
+    res.status(StatusCodes.OK).json({ 
+      success: true, 
+      orderDetails });
   } catch (error) {
     console.error("Error getting order details:", error);
-    res.status(500).json({ success: false, error: "Internal Server Error" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+      success: false, 
+      error: "Internal Server Error" });
   }
 };
 

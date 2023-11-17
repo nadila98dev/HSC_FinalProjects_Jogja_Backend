@@ -11,7 +11,7 @@ const getallCategory = async (req, res) => {
   try {
     const response = await prisma.category.findMany();
     res
-      .status(200)
+      .status(StatusCode.OK)
       .json({
         success: true,
         message: "All categories successfully retrieved",
@@ -19,7 +19,7 @@ const getallCategory = async (req, res) => {
       });
   } catch (err) {
     res
-      .status(500)
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({
         success: false,
         message: `Failed to retrieve categories: ${err.message}`,
@@ -38,11 +38,12 @@ const getCategorybyId = async (req, res) => {
     });
 
     if (!response) {
-      return res.status(404).json({ message: "Category id IS NOT FOUND" });
+      return res.status(StatusCodes.NOT_FOUND).json({ 
+        message: "Category id IS NOT FOUND" });
     }
 
     res
-      .status(200)
+      .status(StatusCodes.OK)
       .json({
         success: true,
         message: "Item by ID is retrieve sucessfully",
@@ -50,7 +51,7 @@ const getCategorybyId = async (req, res) => {
       });
   } catch (err) {
     res
-      .status(404)
+      .status(StatusCodes.NOT_FOUND)
       .json({
         success: false,
         message: `Failed to retrieve category: ${err.message}`,
@@ -74,7 +75,7 @@ const createCategory = async (req, res) => {
     });
     console.log(createCategory);
     res
-      .status(201)
+      .status(StatusCodes.CREATED)
       .json({
         success: true,
         message: "Category has been created successfully",
@@ -82,7 +83,7 @@ const createCategory = async (req, res) => {
       });
   } catch (err) {
     res
-      .status(500)
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({
         success: false,
         message: `Failed to create category: ${err.message}`,
@@ -137,7 +138,7 @@ const updateCategory = async (req, res) => {
       },
     });
     res
-      .status(200)
+      .status(StatusCodes.OK)
       .json({
         success: true,
         message: "Categories has been successfully updated",
@@ -146,7 +147,7 @@ const updateCategory = async (req, res) => {
   } catch (err) {
     console.log(err);
     res
-      .status(400)
+      .status(StatusCodes.BAD_REQUEST)
       .json({
         success: false,
         message: `Failed to update categories: ${err.message}`,
@@ -169,7 +170,7 @@ const deleteCategory = async (req, res) => {
 
     if (!category) {
       return res
-        .status(404)
+        .status(StatusCodes.NOT_FOUND)
         .json({ success: false, message: "Category not found" });
     }
 
@@ -180,7 +181,7 @@ const deleteCategory = async (req, res) => {
     });
 
     res
-      .status(200)
+      .status(StatusCodes.OK)
       .json({
         success: true,
         message: "Category has been deleted",
@@ -188,7 +189,7 @@ const deleteCategory = async (req, res) => {
       });
   } catch (err) {
     res
-      .status(400)
+      .status(StatusCodes.BAD_REQUEST)
       .json({
         success: false,
         message: `Failed to delete categories: ${err.message}`,
