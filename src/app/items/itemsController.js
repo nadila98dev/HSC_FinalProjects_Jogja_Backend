@@ -11,7 +11,7 @@ const prisma = new PrismaClient()
  const getAllItems = async (req, res) => {
     try{
         const response = await prisma.items.findMany()
-        res.status(Status).json({success: true, message: "Items retrieved sucessfully", data: response})
+        res.status(StatusCodes.OK).json({success: true, message: "Items retrieved sucessfully", data: response})
     }catch(err){
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success: false, message: `Failed to retrieve items: ${err.message}`})
     }
@@ -52,23 +52,25 @@ const prisma = new PrismaClient()
 const createItem = async (req, res) => {
    
     try {
-        const body = req.body
-        const src = req.file
-        ? `images/${req.file.filename}`
-      : "images/avatar/default.jpg"
-            const createdItem = await prisma.items.create({
-                data: {
-                    id_category: body.id_category,
-                    name: body.name,
-                    slug: slugify(body.name).toLowerCase(),
-                    src: src,
-                    price: body.price,
-                    address: body.address,
-                    positionlat: body.positionlat,
-                    positionlng: body.positionlng,
-                    description: body.description
-                }
-            })
+        const body = req.body;
+        const image = req.file
+        ? req.file.filename 
+        : "default.jpg"
+
+        const createdItem = await prisma.items.create({
+            data: {
+                id_category: parseInt(body.id_category, 10),
+                name: body.name,
+                slug: slugify(body.name).toLowerCase(),
+                image: image, 
+                price: parseInt(body.price, 10),
+                address: body.address,
+                positionlat: parseFloat(body.positionlat),
+                positionlng: parseFloat(body.positionlng),
+                description: body.description,
+            },
+        })
+
             res.status(201).json({
             success: true, 
             message: "Item has been created sucessfully", 
@@ -82,69 +84,67 @@ const createItem = async (req, res) => {
 
 
 // PUT METHOD
- const updateItem = async (req, res) => {
-    
-    try{
-        const itemId = req.params.id;
-        const body = req.body;
-
-        const existingItem = await prisma.items.findUnique({
-            where: {
-                id: itemId,
-            },
+const updateItem = async (req, res) => {
+    try {
+        const itemId = req.params.id
+      const body = req.body;
+  
+      const existingItem = await prisma.items.findUnique({
+        where: {
+          id: itemId,
+        },
+      });
+  
+      if (!existingItem) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          success: false,
+          message: "Item Not Found",
         });
-
-        if (!existingItem) {
-            return res.status(StatusCodes.NOT_FOUND).json({
-                success: false,
-                message: "Item Not Found",
-            });
-        }
-
-        let updatedSrc = existingItem.src;
-
-        // Check if a new file is uploaded
-        if (req.file) {
-           
-            updatedSrc = `/images/${req.file.filename}`
-
-         
-            if (existingItem.src !== "/images/avatar/default.jpg") {
-                const oldSrc = "public" + existingItem.src;
-
-                fs.unlink(oldSrc, (err) => {
-                    if (err) {
-                        console.error("Failed to delete old source:", err);
-                    } else {
-                        console.log("Old source deleted successfully");
-                    }
-                })
+      }
+  
+      let updatedImage = existingItem.image;
+  
+      // Check if a new file is uploaded
+      if (req.file) {
+        updatedImage = req.file.filename;
+  
+        // Delete the old image file if it's not the default one
+        if (existingItem.image !== "default.jpg") {
+          const oldImage = "public/images/" + existingItem.image;
+  
+          fs.unlink(oldImage, (err) => {
+            if (err) {
+              console.error("Failed to delete old image:", err);
+            } else {
+              console.log("Old image deleted successfully");
             }
+          });
         }
-
-        const updatedItem = await prisma.items.update({
-            where: {
-                id: itemId,
-            },
-            data: {
-                ...body,
-                src: updatedSrc,
-            },
-        });
-
-        res.status(StatusCodes.OK).json({
-            success: true,
-            message: "Item has been successfully updated",
-            data: updatedItem,
-        });
+      }
+  
+      const updatedItem = await prisma.items.update({
+        where: {
+          id: itemId,
+        },
+        data: {
+          ...body,
+          image: updatedImage,
+        },
+      });
+  
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Item has been successfully updated",
+        data: updatedItem,
+      });
     } catch (err) {
-        res.status(StatusCodes.BAD_REQUEST).json({
-            success: false,
-            message: `Failed to update item: ${err.message}`,
-        })
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: `Failed to update item: ${err.message}`,
+      });
     }
-
-} 
+  };
+  
 
 
 // DELETE METHOD

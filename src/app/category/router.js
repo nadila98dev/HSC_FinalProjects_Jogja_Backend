@@ -9,9 +9,9 @@ router.get('/', getallCategory)
 
 router.get('/:id', getCategorybyId)
 
-router.post('/',  upload.single('image'), authenticateAdmin, createCategory)
+router.post('/',  upload.single('image'),  createCategory)
 
-router.put('/:id', upload.single('image'), authenticateAdmin, updateCategory)
+router.put('/:id', upload.single('image'),  updateCategory)
 
 router.delete('/:id', deleteCategory)
 
