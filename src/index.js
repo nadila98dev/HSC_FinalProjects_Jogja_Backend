@@ -9,6 +9,7 @@ const port = process.env.SERVER_PORT || 3000;
 // Router
 
 const authRouter = require('./app/auth/router');
+const accountRouter = require('./app/account/router');
 const categoryRouter = require('./app/category/router');
 const itemRoute = require('./app/items/Items_route');
 const orderRouter = require('./app/transaction/router');
@@ -24,6 +25,9 @@ const version = '/api/v1';
 
 // User / Auth
 app.use(`${version}/auth`, authRouter);
+
+// User Account
+app.use(`${version}/account`, accountRouter)
 
 // category
 
