@@ -1,18 +1,20 @@
 const express = require('express')
 const { getallCategory, getCategorybyId, createCategory, updateCategory, deleteCategory } = require('./controller')
+const upload = require('../../middlewares/multer')
+const { authenticateAdmin } = require('../../middlewares/auth')
 
 const router = express.Router()
 
-router.get('/api/v1/all', getallCategory)
+router.get('/', getallCategory)
 
-router.get('/api/v1/getCategorybyId/:id', getCategorybyId)
+router.get('/:id', getCategorybyId)
 
-router.post('/api/v1/create', createCategory)
+router.post('/',  upload.single('image'), authenticateAdmin, createCategory)
 
-router.put('/api/v1/update/:id', updateCategory)
+router.put('/:id', upload.single('image'), authenticateAdmin, updateCategory)
 
-router.delete('/api/v1/delete/:id', deleteCategory)
+router.delete('/:id', deleteCategory)
 
 
 
-module.exports = router
+module.exports = router 
