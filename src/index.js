@@ -1,21 +1,22 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-require("dotenv").config();
+require('dotenv').config();
 
 const port = process.env.SERVER_PORT || 3000;
 
 // Router
-const authRouter = require("./app/auth/router");
-const categoryRouter = require("./app/category/router")
-const itemRoute = require("./app/items/Items_route");
-const orderRouter = require("./app/transaction/order/router");
-const orderDetailRouter = require("./app/transaction/detailOrder/router");
+const authRouter = require('./app/auth/router');
+const categoryRouter = require('./app/category/router');
+const itemRoute = require('./app/items/Items_route');
+const orderRouter = require('./app/transaction/order/router');
+const orderDetailRouter = require('./app/transaction/detailOrder/router');
+const cartRoute = require('./app/cart/Carts_route');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Version
-const version = "/api/v1";
+const version = '/api/v1';
 
 // app.get('/', (req, res) => {
 //   res.send('Hello World!')
@@ -25,10 +26,13 @@ const version = "/api/v1";
 app.use(`${version}/auth`, authRouter);
 
 // category
-app.use("/categories", categoryRouter)
+app.use('/categories', categoryRouter);
 
 // items
-app.use("/items", itemRoute);
+app.use('/items', itemRoute);
+
+//cart
+app.use('/cart', cartRoute);
 
 //transaction
 app.use(version, orderRouter);
