@@ -31,7 +31,7 @@ app.use("/categories", categoryRouter);
 // items
 app.use("/items", itemRoute);
 //transaction
-app.use(version, orderRouter);
+app.use(`${version}/orders`, orderRouter);
 
 
 app.listen(port, () => {
