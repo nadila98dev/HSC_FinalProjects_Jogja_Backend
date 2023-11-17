@@ -4,7 +4,7 @@ const { StatusCodes } = require("http-status-codes");
 
 const prisma = new PrismaClient();
 
-export const getCarts = async (req, res) => {
+ const getCarts = async (req, res) => {
   try {
     const response = await prisma.cart.findMany({
       where: { userId: req.user.id },
@@ -20,7 +20,7 @@ export const getCarts = async (req, res) => {
   }
 };
 
-export const createCarts = async (req, res) => {
+ const createCarts = async (req, res) => {
   try {
     const { userId, itemsId, quantity, totalprice } = req.body;
 
@@ -46,7 +46,7 @@ export const createCarts = async (req, res) => {
   }
 };
 
-export const deleteCarts = async (req, res) => {
+const deleteCarts = async (req, res) => {
   try {
     const cartId = parseInt(req.params.id);
 
@@ -65,3 +65,5 @@ export const deleteCarts = async (req, res) => {
     res.status(StatusCodes.BAD_REQUEST).json({ msg: error.message });
   }
 };
+
+module.exports = {getCarts, createCarts, deleteCarts}
