@@ -105,7 +105,6 @@ const updateCategory = async (req, res) => {
       },
     });
 
-    
     if (!findCategory) {
       return res.status(StatusCodes.NOT_FOUND).json({
         success: false,
@@ -115,7 +114,7 @@ const updateCategory = async (req, res) => {
 
     if (req.file && findCategory.image && findCategory.image !== "/images/avatar/default.jpg") {
       const oldImage = "public" + findCategory.image;
-    
+
       fs.unlink(oldImage, (err) => {
         if (err) {
           console.error("Failed to delete the old image:", err);
@@ -124,7 +123,6 @@ const updateCategory = async (req, res) => {
         }
       });
     }
-    
 
     const updatedCategory = await prisma.category.update({
       where: {
@@ -132,7 +130,7 @@ const updateCategory = async (req, res) => {
       },
       data: {
         name: body.name,
-        slug: slugify(body.name).toLowerCase(),
+        slug: typeof body.name === 'string' ? slugify(body.name).toLowerCase() : undefined,
         image: images,
       },
       include: {
@@ -142,7 +140,7 @@ const updateCategory = async (req, res) => {
     res.status(StatusCodes.OK)
       .json({
         success: true,
-        message: "Categories has been successfully updated",
+        message: "Categories have been successfully updated",
         data: updatedCategory,
       });
   } catch (err) {
@@ -155,6 +153,7 @@ const updateCategory = async (req, res) => {
       });
   }
 };
+
 
 const deleteCategory = async (req, res) => {
   const body = req.body;
