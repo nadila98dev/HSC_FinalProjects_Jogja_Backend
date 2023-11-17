@@ -24,7 +24,7 @@ app.use("/categories", categoryRouter);
 // items
 app.use("/items", itemRoute);
 //transaction
-app.use(version, orderRouter);
+app.use(`${version}/orders`, orderRouter);
 
 app.listen(port, () => {
   console.log(`Server running in http://localhost:${port}`);
