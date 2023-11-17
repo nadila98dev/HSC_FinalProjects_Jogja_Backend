@@ -2,6 +2,7 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
+const path = require('path');
 require('dotenv').config()
 
 
@@ -18,16 +19,21 @@ const orderRouter = require("./app/transaction/router");
 app.use(express.json());
 app.use(cors())
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Version
 const version = "/api/v1";
+
 
 
 // User / Auth
 app.use(`${version}/auth`, authRouter);
 
 // category
-app.use("/categories", categoryRouter);
+
+app.use(`${version}/categories`, categoryRouter)
+
+
 // items
 app.use("/items", itemRoute);
 //transaction

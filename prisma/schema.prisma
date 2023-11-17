@@ -12,91 +12,84 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  username     String
-  name         String
-  password     String
-  avatar       String?
-  address      String?
-  phone        String?
+  id         String   @id @default(uuid())
+  email      String   @unique
+  name       String
+  password   String
+  avatar     String?
+  address    String?
+  phone      String?
   role       Role     @default(USER)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
   //relation
 
-  orderCart   OrderCart[]
-  cart        Cart[]
+  orderCart OrderCart[]
+  cart      Cart[]
 }
-
 
 // ==================== Category =================== // 
 
-
 model Category {
-   id       Int      @id @default(autoincrement())
-  name      String
-  slug      String
-  image     String?
-  items     Items[]
+  id    Int     @id @default(autoincrement())
+  name  String
+  slug  String
+  image String?
+  items Items[]
 }
 
 // ==================== Items =================== // 
 
 model Items {
-  id           String      @id @default(nanoid(2))
-  id_category  Int   
-  name         String
-  slug         String
-  src          String?
-  price        Int
-  address      String?
-  positionlat  Float?
-  positionlng  Float?
-  description  String  
+  id          String  @id @default(nanoid(2))
+  id_category Int
+  name        String
+  slug        String
+  src         String?
+  price       Int
+  address     String?
+  positionlat Float?
+  positionlng Float?
+  description String
 
   //relation
-  cart         Cart[]
-  category      Category @relation(fields: [id_category], references: [id])
+  cart     Cart[]
+  category Category @relation(fields: [id_category], references: [id])
 }
-
 
 // ==================== cart =================== // 
 
 model Cart {
-  id              String  @id @default(nanoid(3))
-  userId          String
-  itemsId         String
-  quantity        Int
-  totalprice      Int
-  createdAt       DateTime @default(now())
+  id         String   @id @default(nanoid(3))
+  userId     String
+  itemsId    String
+  quantity   Int
+  totalprice Int
+  createdAt  DateTime @default(now())
 
   //relations
-  item            Items @relation(fields: [itemsId], references: [id])
-  
-  orders          OrderCart[]
-  user         User @relation(fields: [userId], references: [id] )
+  item Items @relation(fields: [itemsId], references: [id])
 
+  orders OrderCart[]
+  user   User        @relation(fields: [userId], references: [id])
 }
 
 // ==================== Order and Transaction ==================== //
 
 model OrderCart {
-  id              String @id @default(nanoid(3))
+  id              String   @id @default(nanoid(3))
   userId          String
   cartId          String
   shipment_status String
   createdAt       DateTime @default(now())
 
   //relations
-  cart            Cart @relation(fields: [cartId], references: [id])
-  user            User @relation(fields: [userId], references: [id])
- 
+  cart Cart @relation(fields: [cartId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
 
 enum Role {
   USER
   ADMIN
 }
-

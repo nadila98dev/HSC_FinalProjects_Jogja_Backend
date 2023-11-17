@@ -12,7 +12,7 @@ module.exports = {
 
       if (!email || !name || !password) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-          error: true,
+          success: failed,
           message: "Field has been requeired",
         });
       }
@@ -24,7 +24,7 @@ module.exports = {
       });
       if(user) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-            error: true,
+            success: failed,
             message: "User is registred",
           });
       }
@@ -32,7 +32,7 @@ module.exports = {
       const isEmail = validator.isEmail(email);
       if (!isEmail) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-          error: true,
+          success: failed,
           message: "Invalid Email",
         });
       }
@@ -40,7 +40,7 @@ module.exports = {
       const isPassword = validator.isStrongPassword(password);
       if (!isPassword) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-          error: true,
+          success: failed,
           message: "Password Not Strong",
         });
       }
@@ -60,20 +60,20 @@ module.exports = {
         return (
           res.status(StatusCodes.INTERNAL_SERVER_ERROR),
           json({
-            error: true,
+            success: false,
             message: "Signup Failed",
           })
         );
       }
 
       return res.status(StatusCodes.CREATED).json({
-        error: false,
+        success: true,
         message: "Signup Succesfully",
       });
     } catch (err) {
       console.log(err);
       return res.status(StatusCodes.BAD_REQUEST).json({
-        error: false,
+        success: false,
         message: (err.code = "P2002"
           ? "User is registred"
           : err || "internal server error"),
@@ -86,7 +86,7 @@ module.exports = {
 
       if (!email || !password) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-          error: true,
+          success: true,
           message: "Field has been provided",
         });
       }
@@ -94,7 +94,7 @@ module.exports = {
       const isEmail = validator.isEmail(email);
       if (!isEmail) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-          error: true,
+          success: true,
           message: "Invalid Email",
         });
       }
@@ -106,7 +106,7 @@ module.exports = {
       });
       if (!user) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-          error: true,
+          success: false,
           message: "Invalid Credentials",
         });
       }
@@ -115,7 +115,7 @@ module.exports = {
 
       if (!comparePassword) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-          error: true,
+          success: false,
           message: "Invalid Credentials",
         });
       }
@@ -123,19 +123,18 @@ module.exports = {
       const token = createJWT({ payload: createToken(user) });
 
       return res.status(StatusCodes.OK).json({
-        error: false,
+        success: true,
         message: "Login Succesfull",
         token: token,
       });
     } catch (err) {
       return res.status(500).json({
-        error: true,
+        success: false,
         message: err.message || "Internal Server Error",
       });
     }
   },
   detailUser: async(req, res) => {
-    console.log(req.user)
     try {
       const user = await prisma.user.findFirst({
           where: {
@@ -149,15 +148,14 @@ module.exports = {
               role: true
           }
       })
-      console.log(user)
 
       return res.status(200).json({
-          error: false,
+          success: true,
           data: user
       })
   } catch (err) {
       return res.status(500).json({
-          error: true,
+          success: false,
           message: err.message ?? 'Internal Server Error'
       })
   }
