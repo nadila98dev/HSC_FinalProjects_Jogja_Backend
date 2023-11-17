@@ -1,16 +1,18 @@
 const express = require('express')
 const { getAllItems, getItembyId, createItem, updateItem, deleteItem } = require('./itemsController')
+const upload = require('../../middlewares/multer')
+const { authenticateAdmin } = require('../../middlewares/auth')
 
 const router = express.Router()
 
-router.get('/api/v1/all', getAllItems)
+router.get('/', getAllItems)
 
-router.get('/api/v1/itembyid/:id', getItembyId)
+router.get('/:id', getItembyId)
 
-router.post('/api/v1/create', createItem)
+router.post('', upload.single('image'), authenticateAdmin, createItem)
 
-router.put('/api/v1/update/:id', updateItem)
+router.put('/:id', upload.single('image'), authenticateAdmin, updateItem)
 
-router.delete('/api/v1/delete/:id', deleteItem);
+router.delete('/:id', deleteItem);
 
 module.exports = router
