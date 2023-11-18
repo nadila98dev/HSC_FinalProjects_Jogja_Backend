@@ -4,56 +4,80 @@ const prisma = new PrismaClient();
 const { StatusCodes } = require("http-status-codes");
 
 const createOrder = async (req, res) => {
-  const { cartId } = req.body;
-  const { userId } = req.user.id;
+  // const { cartId } = req.body;
+  const  userId  = req.user.id;
+  console.log(userId)
 
   try {
-    if (!cartId) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ success: false, 
-          error: "cartId is required" });
-    }
 
-    if (!userId) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ 
-          success: false, 
-          error: "cartId is required" });
-    }
-
-    const existingCart = await prisma.cart.findUnique({
-      where: { id: userId },
-      include: {
-        cart: {
-          include: {
-            orderCart: {
-              items: true,
-            },
-          },
-        },
-      },
+    const existingCart = await prisma.cart.findMany({
+      where: { userId: userId },
+      include:{
+        item: true
+      }
     });
+    console.log(existingCart)
 
-    if (!existingCart) {
+
+    if (!existingCart || existingCart.length === 0) {
       return res.status(StatusCodes.NOT_FOUND).json({ 
         success: false, 
         error: "Cart not found" });
     }
 
+    const totalCartPrice = existingCart.reduce((acc, cart) => {
+      return acc + cart.totalprice;
+    }, 0);
+
     const newOrder = await prisma.orderCart.create({
       data: {
-        cartId: existingCart.id,
-        statusOrder: "Process",
+        userId,
+        shipment_status: "Process",
+       items: {
+          create: existingCart.flatMap((cart) =>
+            ({
+              id_category: cart.item.id_category,
+              name: cart.item.name,
+              slug: cart.item.slug,
+              image: cart.item.image,
+              price: cart.item.price,
+              address: cart.item.address,
+              positionlat: cart.item.positionlat,
+              positionlng: cart.item.positionlng,
+              description: cart.item.description,
+            })
+          ),
+        },
+        createdAt: new Date(),
+        totalCartPrice: totalCartPrice,
+        
       },
+      select: {
+        items: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            price: true
+          }
+        },
+        shipment_status: true,
+        totalCartPrice: true,
+        createdAt: true
+      }
     });
+
+    await prisma.cart.deleteMany({
+      where: {
+        userId
+      }
+    })
 
     // buat ngubah status dlm 5 menit (optional)
     setTimeout(async () => {
       await prisma.orderCart.update({
         where: { id: newOrder.id },
-        data: { statusOrder: "Delivered" },
+        data: { shipment_status: "Delivered" },
       });
     }, 5 * 60 * 1000);
 
@@ -67,21 +91,15 @@ const createOrder = async (req, res) => {
 };
 
 const getAllOrders = async (req, res) => {
-  const { userId } = req.user.id;
+  const userId  = req.user.id;
 
   try {
     const orders = await prisma.orderCart.findMany({
       where: {
-        cart: {
-          userId: userId,
-        },
+        userId
       },
       include: {
-        cart: {
-          include: {
-            items: true,
-          },
-        },
+        items: true 
       },
     });
 
@@ -96,7 +114,7 @@ const getAllOrders = async (req, res) => {
 
 const getOrderDetails = async (req, res) => {
   const { orderId } = req.params;
-  const { userId } = req.user.id;
+  const userId  = req.user.id;
 
   try {
     const orderDetails = await prisma.orderCart.findUnique({
