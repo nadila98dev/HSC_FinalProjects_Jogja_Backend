@@ -13,6 +13,6 @@ router.post('/', upload.single('image'),authenticateAdmin, createItem)
 
 router.put('/:id', upload.single('image'), authenticateAdmin, updateItem)
 
-router.delete('/:id', deleteItem);
+router.delete('/:id', authenticateAdmin, deleteItem);
 
 module.exports = router
