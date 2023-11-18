@@ -4,9 +4,7 @@ const prisma = new PrismaClient();
 const { StatusCodes } = require("http-status-codes");
 
 const createOrder = async (req, res) => {
-  // const { cartId } = req.body;
   const  userId  = req.user.id;
-  console.log(userId)
 
   try {
 
@@ -120,16 +118,6 @@ const getOrderDetails = async (req, res) => {
     const orderDetails = await prisma.orderCart.findUnique({
       where: {
         id: orderId,
-        cart: {
-          userId: userId,
-        },
-      },
-      include: {
-        cart: {
-          include: {
-            items: true,
-          },
-        },
       },
     });
 

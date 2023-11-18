@@ -5,6 +5,6 @@ const { authenticateUser } = require("../../middlewares/auth");
 
 router.post("/", authenticateUser, createOrder);
 router.get("/", authenticateUser, getAllOrders);
-router.get("/:orderId", getOrderDetails);
+router.get("/:orderId", authenticateUser, getOrderDetails);
 
 module.exports = router;
