@@ -7,8 +7,9 @@ const validator = require("validator");
 
 module.exports = {
   signup: async (req, res) => {
+    const { email, name, password, role } = req.body;
+
     try {
-      const { email, name, password } = req.body;
 
       if (!email || !name || !password) {
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -53,6 +54,7 @@ module.exports = {
           email,
           name,
           password: hashPassword,
+          role,
         },
       });
 
@@ -71,7 +73,6 @@ module.exports = {
         message: "Signup Succesfully",
       });
     } catch (err) {
-      console.log(err);
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: (err.code = "P2002"
@@ -81,8 +82,8 @@ module.exports = {
     }
   },
   signin: async (req, res) => {
+    const { email, password } = req.body;
     try {
-      const { email, password } = req.body;
 
       if (!email || !password) {
         return res.status(StatusCodes.BAD_REQUEST).json({

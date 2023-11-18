@@ -4,7 +4,7 @@ const { authenticateUser } = require('../../middlewares/auth');
 const router =  express.Router();
 
 
-router.put('/update', update)
-router.put('/update-image', updateImage)
+router.put('/update', authenticateUser, update)
+router.put('/update-image', authenticateUser, updateImage)
 
 module.exports = router

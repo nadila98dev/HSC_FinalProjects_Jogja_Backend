@@ -13,7 +13,7 @@ router.post('/',  upload.single('image'), authenticateAdmin, createCategory)
 
 router.put('/:id', upload.single('image'), authenticateAdmin, updateCategory)
 
-router.delete('/:id', deleteCategory)
+router.delete('/:id', authenticateAdmin, deleteCategory)
 
 
 
