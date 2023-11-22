@@ -27,6 +27,7 @@ model User {
 
   orderCart OrderCart[]
   cart      Cart[]
+  saved     Saved[]
 }
 
 // ==================== Category =================== // 
@@ -37,6 +38,9 @@ model Category {
   slug  String
   image String?
   items Items[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
 }
 
 // ==================== Items =================== // 
@@ -52,11 +56,14 @@ model Items {
   positionlat Float?
   positionlng Float?
   description String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   //relation
   cart      Cart[]
   category  Category    @relation(fields: [id_category], references: [id])
   orderCart OrderCart[]
+  saved     Saved[]
 }
 
 // ==================== cart =================== // 
@@ -67,7 +74,8 @@ model Cart {
   itemsId    String
   quantity   Int
   totalprice Int
-  createdAt  DateTime @default(now())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   //relations
   item Items @relation(fields: [itemsId], references: [id])
@@ -80,11 +88,18 @@ model Cart {
 model OrderCart {
   id              String   @id @default(nanoid(3))
   userId          String
+  // trxId           String
+  // trxItem         Int
   // cartId          String
   items           Items[]
-  shipment_status String
   totalCartPrice  Int
-  createdAt       DateTime @default(now())
+  linkPayment     String?
+  detetimePayment DateTime?
+  statusPayment   StatusPayment @default(PENDING)
+  statusOrder     StatusOrder @default(PENDING)
+  itemId          String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   //relations
   // cart Cart[]
@@ -92,7 +107,33 @@ model OrderCart {
   user User @relation(fields: [userId], references: [id])
 }
 
+model Saved {
+  id      String   @id @default(nanoid(2))
+  itemsId    String
+  userId     String
+
+  user User @relation(fields: [userId], references: [id])
+  item Items @relation(fields: [itemsId], references: [id])
+
+
+
+}
+
 enum Role {
   USER
   ADMIN
+}
+
+enum StatusPayment {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum StatusOrder {
+  PENDING
+  PROCESS
+  SHIPPED
+  DELIVERED
+  FAILED
 }
