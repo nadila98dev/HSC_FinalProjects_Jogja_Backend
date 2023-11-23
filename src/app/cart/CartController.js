@@ -37,7 +37,8 @@ const createCarts = async (req, res) => {
   try {
     const findCartItem = await prisma.cart.findFirst({
       where: {
-        itemsId: itemsId
+        itemsId: itemsId,
+        userId: req.user.id
       },
       select: {
         id: true,

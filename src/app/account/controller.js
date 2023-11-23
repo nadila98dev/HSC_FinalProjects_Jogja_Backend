@@ -6,6 +6,10 @@ const { StatusCodes } = require("http-status-codes");
 module.exports = {
     update: async(req, res) => {
         try {
+
+            const {name, address, phone } = req.body
+
+            
             
         } catch (err) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
