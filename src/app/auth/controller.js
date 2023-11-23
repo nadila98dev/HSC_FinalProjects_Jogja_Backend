@@ -146,7 +146,9 @@ module.exports = {
               name: true,
               avatar: true,
               email: true,
-              role: true
+              role: true,
+              address: true,
+              phone: true
           }
       })
 
