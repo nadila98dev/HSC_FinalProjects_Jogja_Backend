@@ -1,7 +1,9 @@
 const { StatusCodes } = require("http-status-codes");
 const { jwtVerify } = require("../utils/jwt");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
-const authenticateUser = (req, res, next) =>{
+const authenticateUser = async (req, res, next) =>{
     try {
         let token;
 
@@ -19,7 +21,18 @@ const authenticateUser = (req, res, next) =>{
 
         const payload = jwtVerify({token})
 
-        console.log(payload)
+        const checkUser =  await prisma.user.findUnique({
+            where:{
+                email: payload.email
+            }
+        })
+        if(!checkUser){
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                error: true,
+                message: 'UNAUTHORIZED'
+            })
+        }
+
        
 
         req.user = {
@@ -27,7 +40,6 @@ const authenticateUser = (req, res, next) =>{
             id: payload.id,
             role: payload.role,
         }
-        console.log(req.user)
 
         next()
 
@@ -36,7 +48,7 @@ const authenticateUser = (req, res, next) =>{
     }
 }
 
-const authenticateAdmin = (req, res, next) =>{
+const authenticateAdmin = async(req, res, next) =>{
     try {
         let token;
 
@@ -54,6 +66,18 @@ const authenticateAdmin = (req, res, next) =>{
 
         const payload = jwtVerify({token})
 
+        const checkUser =  await prisma.user.findUnique({
+            where:{
+                email: payload.email
+            }
+        })
+        if(!checkUser){
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                error: true,
+                message: 'UNAUTHORIZED'
+            })
+        }
+
         if(payload.role !== 'ADMIN'){
             return res.status(StatusCodes.FORBIDDEN).json({
                 error: true,
@@ -61,7 +85,6 @@ const authenticateAdmin = (req, res, next) =>{
             })
         }
 
-        console.log(payload)
        
 
         req.user = {
@@ -69,7 +92,6 @@ const authenticateAdmin = (req, res, next) =>{
             id: payload.id,
             role: payload.role,
         }
-        console.log(req.user)
 
         next()
 

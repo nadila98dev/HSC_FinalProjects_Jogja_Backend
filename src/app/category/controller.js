@@ -9,13 +9,32 @@ const prisma = new PrismaClient();
 // GET METHOD
 const getallCategory = async (req, res) => {
   try {
-    const response = await prisma.category.findMany();
+    let { limit , pageNumber } = req.query;
+
+    limit = limit ? Number(limit) : undefined;
+    pageNumber = pageNumber ? parseInt(pageNumber) : 1;
+    
+    let skip;
+    if (limit && pageNumber) {
+      skip = (pageNumber - 1) * limit;
+    }
+
+    const totalCategories = await prisma.category.count();
+    const totalPages = limit ? Math.ceil(totalCategories / limit) : 1;
+
+    const response = await prisma.category.findMany({
+      skip,
+      take: limit,
+    });
     res
       .status(StatusCodes.OK)
       .json({
         success: true,
         message: "All categories successfully retrieved",
         data: response,
+        totalItems: totalCategories,
+        totalPages,
+        currentPage:  parseInt(pageNumber)
       });
   } catch (err) {
     res
@@ -73,7 +92,6 @@ const createCategory = async (req, res) => {
         image: images,
       },
     });
-    console.log(createCategory);
     res
       .status(StatusCodes.CREATED)
       .json({
@@ -97,7 +115,7 @@ const updateCategory = async (req, res) => {
   try {
     const categoryId = Number(req.params.id);
 
-    const images = req.file ? `/images/${req.file.filename}` : body.image;
+    const images = req.file ? `images/${req.file.filename}` : body.image;
 
     const findCategory = await prisma.category.findUnique({
       where: {
