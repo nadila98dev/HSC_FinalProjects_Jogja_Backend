@@ -11,7 +11,13 @@ const getCarts = async (req, res) => {
         id: true,
         quantity: true,
         totalprice: true,
-        item: true
+        item: {
+          select:{
+            id: true,
+            name: true,
+            price: true
+          }
+        }
       },
     });
     const totalCartPrice = response.reduce((acc, cart) => {
@@ -100,7 +106,6 @@ const createCarts = async (req, res) => {
       res.status(StatusCodes.CREATED).json(cart);
     
   } catch (error) {
-    console.log(error)
     res.status(StatusCodes.BAD_REQUEST).json({
       msg: error.message,
     });
@@ -110,7 +115,6 @@ const createCarts = async (req, res) => {
 const deleteCarts = async (req, res) => {
   try {
     const cartId = req.params.id;
-    console.log(cartId)
 
     const checkCart = await prisma.cart.findUnique({
       where:{

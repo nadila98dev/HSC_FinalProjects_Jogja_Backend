@@ -13,7 +13,7 @@ module.exports = {
 
       if (!email || !name || !password) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-          success: failed,
+          success: false,
           message: "Field has been requeired",
         });
       }
@@ -106,6 +106,60 @@ module.exports = {
         },
       });
       if (!user) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: "Invalid Credentials",
+        });
+      }
+
+      const comparePassword = bcrypt.compareSync(password, user.password);
+
+      if (!comparePassword) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: "Invalid Credentials",
+        });
+      }
+
+      const token = createJWT({ payload: createToken(user) });
+
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Login Succesfull",
+        token: token,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message || "Internal Server Error",
+      });
+    }
+  },
+  signinAdmin: async (req, res) => {
+    const { email, password } = req.body;
+    try {
+
+      if (!email || !password) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          success: true,
+          message: "Field has been provided",
+        });
+      }
+
+      const isEmail = validator.isEmail(email);
+      if (!isEmail) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          success: true,
+          message: "Invalid Email",
+        });
+      }
+
+      const user = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+      if (!user || user.role !== 'ADMIN') {
         return res.status(StatusCodes.BAD_REQUEST).json({
           success: false,
           message: "Invalid Credentials",
