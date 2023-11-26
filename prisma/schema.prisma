@@ -79,7 +79,6 @@ model Cart {
 
   //relations
   item Items @relation(fields: [itemsId], references: [id])
-  // orders OrderCart[]
   user User  @relation(fields: [userId], references: [id])
 }
 
@@ -102,8 +101,6 @@ model OrderCart {
 
   //relations
   user User @relation(fields: [userId], references: [id])
-  // Items   Items?  @relation(fields: [itemsId], references: [id])
-  // itemsId String?
 }
 
 model Saved {
