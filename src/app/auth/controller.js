@@ -189,6 +189,27 @@ module.exports = {
       });
     }
   },
+  count: async(req, res) => {
+    try {
+        const user = await prisma.user.count()
+        const category = await prisma.category.count()
+        const items = await prisma.items.count()
+        const transaction = await prisma.orderCart.count()
+
+        return res.status(200).json({
+            error: false,
+            user: user,
+            category: category,
+            items: items,
+            transaction: transaction,
+        })
+    } catch (err) {
+        return res.status(500).json({
+            error: true,
+            message: err.message ?? 'Internal Server Error'
+        })
+    }
+},
   detailUser: async(req, res) => {
     try {
       const user = await prisma.user.findFirst({
