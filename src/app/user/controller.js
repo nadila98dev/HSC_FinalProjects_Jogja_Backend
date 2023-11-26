@@ -7,16 +7,50 @@ const validator = require("validator");
 module.exports = {
   getAllUser: async (req, res) => {
     try {
-      const { limit , pageNumber  } = req.query;
+      const { limit , pageNumber, keyword  } = req.query;
 
       const skip = (pageNumber - 1) * limit;
       const take = Number(limit);
 
       const totalUsers = await prisma.user.count();
       const totalPages = Math.ceil(totalUsers / limit);
+
+      const userLength = await prisma.user.findMany({
+        where:{
+         OR: [
+          {
+            email:{
+              contains: keyword
+            },
+          },
+          {
+            name: {
+              contains: keyword
+            }
+          }
+         ]
+        }
+      });
+
+      const resUserLength = userLength.length
+
       const user = await prisma.user.findMany({
         skip,
         take,
+        where:{
+         OR: [
+          {
+            email:{
+              contains: keyword
+            },
+          },
+          {
+            name: {
+              contains: keyword
+            }
+          }
+         ]
+        }
       });
 
       return res.status(200).json({
@@ -24,6 +58,7 @@ module.exports = {
         data: user,
         totalPages,
         currentPage: parseInt(pageNumber),
+        currentItems: resUserLength
       });
     } catch (err) {
       return res.status(500).json({
@@ -40,7 +75,6 @@ module.exports = {
           id,
         },
       });
-      console.log(user);
 
       return res.status(200).json({
         error: false,
@@ -56,7 +90,6 @@ module.exports = {
   create: async (req, res) => {
     try {
       const { name, email, password } = req.body;
-      console.log(req.body)
 
       if (!email || !name || !password) {
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -113,7 +146,6 @@ module.exports = {
         });
       }
     } catch (err) {
-      console.log(err);
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: (err.code = "P2002" ? "Internal Server Error" : err),
@@ -123,7 +155,6 @@ module.exports = {
   update: async (req, res) => {
     try {
       const { id } = req.params;
-      console.log(id);
       const { name, email, password } = req.body;
 
       const checkUser = await prisma.user.findUnique({
@@ -131,7 +162,10 @@ module.exports = {
       });
 
       if (!checkUser) {
-        return NotFound(res, "Users Not Found");
+        return res.status(StatusCodes.NOT_FOUND).json({
+            success: false,
+            message: 'User Not Found'
+        })
       }
 
       let hashPassword;
@@ -149,21 +183,16 @@ module.exports = {
           password: hashPassword,
         },
       });
-      console.log(result);
 
-      if (!result) {
-        BadRequest(res, "Failed Created Users");
-      } else {
         return res.status(StatusCodes.OK).json({
           error: false,
           data: result,
         });
-      }
+      
     } catch (err) {
-      console.log(err);
       return res.status(StatusCodes.BAD_REQUEST).json({
         error: false,
-        message: (err.code = "P2002" ? "Duplicate Userss" : err),
+        message: (err.code = "P2002" ? "Duplicate Users" : err),
       });
     }
   },
@@ -192,7 +221,6 @@ module.exports = {
         message: "Deleted Succesfully",
       });
     } catch (err) {
-      console.log(err);
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: err.message,

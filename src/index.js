@@ -30,10 +30,7 @@ app.use('/images', express.static(path.join(__dirname, '../public/images')));
 // Version
 const version = '/api/v1';
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
-  next();
-})
+
 
 // User / Auth
 app.use(`${version}/auth`, authRouter);

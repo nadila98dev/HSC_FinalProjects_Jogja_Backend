@@ -9,9 +9,8 @@ const prisma = new PrismaClient();
 // GET METHOD
 const getallCategory = async (req, res) => {
   try {
-    let { limit , pageNumber } = req.query;
-
-    limit = limit ? Number(limit) : undefined;
+    let { limit , pageNumber, keyword } = req.query;
+    limit = limit ? parseInt(limit) : undefined;
     pageNumber = pageNumber ? parseInt(pageNumber) : 1;
     
     let skip;
@@ -22,10 +21,26 @@ const getallCategory = async (req, res) => {
     const totalCategories = await prisma.category.count();
     const totalPages = limit ? Math.ceil(totalCategories / limit) : 1;
 
+    const itemsLength = await prisma.category.findMany({
+      where:{
+        name:{
+          contains: keyword
+        }
+      }
+    });
+
+    const resLength = itemsLength.length
+
     const response = await prisma.category.findMany({
       skip,
       take: limit,
+      where:{
+        name:{
+          contains: keyword
+        }
+      }
     });
+
     res
       .status(StatusCodes.OK)
       .json({
@@ -33,8 +48,10 @@ const getallCategory = async (req, res) => {
         message: "All categories successfully retrieved",
         data: response,
         totalItems: totalCategories,
+        limit,
         totalPages,
-        currentPage:  parseInt(pageNumber)
+        currentPage:  parseInt(pageNumber),
+        currentItems: resLength
       });
   } catch (err) {
     res
@@ -48,7 +65,7 @@ const getallCategory = async (req, res) => {
 
 // GET METHOD (SPECIFIC BY ID)
 const getCategorybyId = async (req, res) => {
-  const categoryId = Number(req.params.id);
+  const categoryId = parseInt(req.params.id);
   try {
     const response = await prisma.category.findUnique({
       where: {
