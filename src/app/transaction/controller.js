@@ -6,7 +6,7 @@ const { PaymentGateway } = require("../../utils/midtrans");
 const midtransClient = require("midtrans-client");
 const crypto = require("crypto");
 const config = require("../../config");
-const moment = require('moment-timezone');
+const moment = require("moment-timezone");
 
 const createOrder = async (req, res) => {
   const userId = req.user.id;
@@ -24,6 +24,7 @@ const createOrder = async (req, res) => {
             id_category: true,
             name: true,
             price: true,
+            image: true,
           },
         },
       },
@@ -34,7 +35,8 @@ const createOrder = async (req, res) => {
         id: cartItem.item.id, // Sesuaikan dengan cara Anda ingin menghasilkan ID
         price: cartItem.item.price,
         quantity: cartItem.quantity,
-        name: cartItem.item.name, // Sesuaikan sesuai kebutuhan
+        name: cartItem.item.name,
+        image: cartItem.item.image, // Sesuaikan sesuai kebutuhan
       };
       return item;
     });
@@ -101,7 +103,6 @@ const createOrder = async (req, res) => {
       },
     });
 
-
     // Comvert String To Json
     const payloadJson = JSON.parse(newOrder.cartData);
 
@@ -110,7 +111,7 @@ const createOrder = async (req, res) => {
       trxId: newOrder.trxId,
       linkPayment: newOrder.linkPayment,
       data: payloadJson,
-      stasutPayment: newOrder.statusPayment,
+      statusPayment: newOrder.statusPayment,
     });
   } catch (error) {
     console.error("Error creating an order:", error);
@@ -138,26 +139,27 @@ const getAllOrders = async (req, res) => {
         detetimePayment: true,
         statusPayment: true,
         statusOrder: true,
-        cartData: true
-      }
+        cartData: true,
+      },
     });
-    
+
     const resOrders = orders.map((order) => {
-      const convertDate = moment(order.detetimePayment).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
+      const convertDate = moment(order.detetimePayment)
+        .tz("Asia/Jakarta")
+        .format("YYYY-MM-DD HH:mm:ss");
       return {
         id: order.id,
-      userId: order.userId,
-      trxId: order.trxId,
-      totalCartPrice: order.totalCartPrice,
-      linkPayment: order.linkPayment,
-      paymentType: order.paymentType,
-      detetimePayment: convertDate,
-      statusPayment: order.statusPayment,
-      statusOrder: order.statusOrder,
-      cartData: JSON.parse(order.cartData),
-      }
+        userId: order.userId,
+        trxId: order.trxId,
+        totalCartPrice: order.totalCartPrice,
+        linkPayment: order.linkPayment,
+        paymentType: order.paymentType,
+        detetimePayment: convertDate,
+        statusPayment: order.statusPayment,
+        statusOrder: order.statusOrder,
+        cartData: JSON.parse(order.cartData),
+      };
     });
-  
 
     res.status(StatusCodes.OK).json({ success: true, data: resOrders });
   } catch (err) {
@@ -169,32 +171,31 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-const updateStatusOrder = async(req, res) => {
-  const {id} = req.params
-  const {statusOrder} = req.body 
+const updateStatusOrder = async (req, res) => {
+  const { id } = req.params;
+  const { statusOrder } = req.body;
   try {
     const orders = await prisma.orderCart.update({
-      where:{
+      where: {
         id,
-        userId: req.user.id
+        userId: req.user.id,
       },
-      data:{
-        statusOrder: statusOrder
-      }
-    })
+      data: {
+        statusOrder: statusOrder,
+      },
+    });
 
     return res.status(StatusCodes.OK).json({
       success: true,
-      message: 'Update Status Order Success'
-    })
-
+      message: "Update Status Order Success",
+    });
   } catch (err) {
-    return  res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       error: err.message || "Internal Server Error",
     });
   }
-}
+};
 
 const getOrderDetails = async (req, res) => {
   const { orderId } = req.params;
@@ -204,6 +205,17 @@ const getOrderDetails = async (req, res) => {
     const orderDetails = await prisma.orderCart.findUnique({
       where: {
         id: orderId,
+      },
+      select: {
+        id: true,
+        userId: true,
+        user: {
+          select: {
+            address: true,
+            name: true,
+            phone: true,
+          },
+        },
       },
     });
 
@@ -357,5 +369,5 @@ module.exports = {
   getAllOrders,
   getOrderDetails,
   webhook,
-  updateStatusOrder
+  updateStatusOrder,
 };
