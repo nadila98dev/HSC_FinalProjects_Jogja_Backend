@@ -10,10 +10,53 @@ const prisma = new PrismaClient()
 // GET METHOD
  const getAllItems = async (req, res) => {
     try{
-        const response = await prisma.items.findMany()
-        res.status(StatusCodes.OK).json({success: true, message: "Items retrieved sucessfully", data: response})
+      let {limit, pageNumber, keyword} = req.query
+      limit = limit ? parseInt(pageNumber) : undefined
+      pageNumber = pageNumber ? parseInt(pageNumber) : 1
+
+      let skip 
+      if(limit && pageNumber) {
+        skip = (pageNumber - 1) * limit
+      }
+
+      const totalItems = await prisma.items.count()
+      const totalPages = limit ? Math.ceil(totalItems / limit) : 1
+
+      const itemLength = await prisma.items.findMany({
+        where: {
+          name: {
+            contains: keyword
+          }
+        }
+      })
+
+      const resLength = itemLength.length
+
+
+        const response = await prisma.items.findMany({
+          skip,
+          take: limit,
+          where: {
+            name:{
+              contains: keyword
+            }
+          }
+        })
+
+        res.status(StatusCodes.OK)
+        .json({success: true, 
+          message: "Items retrieved sucessfully", 
+          data: response,
+        totalItems: totalItems,
+        limit,
+        totalPages,
+        currentPage: parseInt(pageNumber),
+        currentItems: resLength
+      })
     }catch(err){
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success: false, message: `Failed to retrieve items: ${err.message}`})
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({success: false, 
+          message: `Failed to retrieve items: ${err.message}`})
     }
 
 }
