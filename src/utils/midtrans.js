@@ -1,9 +1,7 @@
 const midtransClient = require("midtrans-client");
-require('dotenv').config()
+require("dotenv").config();
 
-const PaymentGateway = async(price, trxid, itemDetails, user) => {
-
-
+const PaymentGateway = async (price, trxid, itemDetails, user) => {
   let snap = new midtransClient.Snap({
     isProduction: false,
     serverKey: process.env.MIDTRANS_SERVER_KEY,
@@ -17,19 +15,30 @@ const PaymentGateway = async(price, trxid, itemDetails, user) => {
     },
     item_details: itemDetails,
     customer_details: {
-        name: user.name,
-        email: user.email,
-        phone: user.phone ?? "",
-        billing_address: {
-            address: user.address ?? ""
-        },
+      name: user.name,
+      email: user.email,
+      phone: user.phone ?? "",
+      billing_address: {
+        address: user.address ?? "",
+      },
     },
     credit_card: {
       secure: true,
     },
-    enabled_payments: ["credit_card", "mandiri_clickpay","bca_klikbca", "bca_klikpay", "bri_epay", "bca_va", "bni_va", "other_va", "gopay", "other_qris"],
+    enabled_payments: [
+      "credit_card",
+      "mandiri_clickpay",
+      "bca_klikbca",
+      "bca_klikpay",
+      "bri_epay",
+      "bca_va",
+      "bni_va",
+      "other_va",
+      "gopay",
+      "other_qris",
+    ],
     callbacks: {
-        "finish": "https://jogja-istemewa.vercel.app/"
+      finish: "https://jogja-istemewa.vercel.app/",
     },
     // expiry: {
     //     "start_time": "2025-12-20 18:11:08 +0700",
@@ -42,9 +51,9 @@ const PaymentGateway = async(price, trxid, itemDetails, user) => {
     // transaction redirect_url
     let redirectUrl = transaction.redirect_url;
     console.log("redirectUrl:", redirectUrl);
-    return redirectUrl
+    return redirectUrl;
   });
-  return {res, parameter}
+  return { res, parameter };
 };
 
-module.exports = {PaymentGateway}
+module.exports = { PaymentGateway };
