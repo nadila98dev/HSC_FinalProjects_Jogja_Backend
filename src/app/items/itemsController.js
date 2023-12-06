@@ -102,7 +102,7 @@ const createItem = async (req, res) => {
 
         const createdItem = await prisma.items.create({
             data: {
-                id_category: parseInt(body.id_category, 10),
+                categoryId: parseInt(body.categoryId, 10),
                 name: body.name,
                 slug: slugify(body.name).toLowerCase(),
                 image: image, 
