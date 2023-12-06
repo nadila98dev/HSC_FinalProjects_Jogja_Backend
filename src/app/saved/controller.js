@@ -4,7 +4,8 @@ const { StatusCodes } = require("http-status-codes");
 const prisma = new PrismaClient();
 
 const saveItemAsFavorite = async (req, res) => {
-  const { userId, itemId } = req.body;
+  const { itemId } = req.body;
+  const userId = req.user.id;
 
   try {
     const existingSavedItem = await prisma.saved.findFirst({
@@ -95,7 +96,8 @@ const getSavedItemsByUserId = async (req, res) => {
 };
 
 const deleteSavedItem = async (req, res) => {
-  const { userId, itemId } = req.body;
+  const { itemId } = req.body;
+  const userId = req.user.id;
 
   try {
     const deletedItem = await prisma.saved.deleteMany({
