@@ -47,7 +47,7 @@ model Category {
 
 model Items {
   id          String   @id @default(nanoid(2))
-  id_category Int
+  categoryId  Int
   name        String
   slug        String
   image       String?
@@ -61,7 +61,7 @@ model Items {
 
   //relation
   cart      Cart[]
-  category  Category    @relation(fields: [id_category], references: [id])
+  category  Category    @relation(fields: [categoryId], references: [id])
   orderCart OrderCart[]
   saved     Saved[]
 }

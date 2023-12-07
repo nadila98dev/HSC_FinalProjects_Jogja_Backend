@@ -10,7 +10,6 @@ module.exports = {
     const { email, name, password, role } = req.body;
 
     try {
-
       if (!email || !name || !password) {
         return res.status(StatusCodes.BAD_REQUEST).json({
           success: false,
@@ -23,11 +22,11 @@ module.exports = {
           email,
         },
       });
-      if(user) {
+      if (user) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-            success: failed,
-            message: "User is registred",
-          });
+          success: failed,
+          message: "User is registred",
+        });
       }
 
       const isEmail = validator.isEmail(email);
@@ -45,7 +44,6 @@ module.exports = {
           message: "Password Not Strong",
         });
       }
-
 
       const hashPassword = bcrypt.hashSync(password, 10);
 
@@ -84,7 +82,6 @@ module.exports = {
   signin: async (req, res) => {
     const { email, password } = req.body;
     try {
-
       if (!email || !password) {
         return res.status(StatusCodes.BAD_REQUEST).json({
           success: true,
@@ -138,7 +135,6 @@ module.exports = {
   signinAdmin: async (req, res) => {
     const { email, password } = req.body;
     try {
-
       if (!email || !password) {
         return res.status(StatusCodes.BAD_REQUEST).json({
           success: true,
@@ -159,7 +155,7 @@ module.exports = {
           email,
         },
       });
-      if (!user || user.role !== 'ADMIN') {
+      if (!user || user.role !== "ADMIN") {
         return res.status(StatusCodes.BAD_REQUEST).json({
           success: false,
           message: "Invalid Credentials",
@@ -189,53 +185,53 @@ module.exports = {
       });
     }
   },
-  count: async(req, res) => {
+  count: async (req, res) => {
     try {
-        const user = await prisma.user.count()
-        const category = await prisma.category.count()
-        const items = await prisma.items.count()
-        const transaction = await prisma.orderCart.count()
-
-        return res.status(200).json({
-            error: false,
-            user: user,
-            category: category,
-            items: items,
-            transaction: transaction,
-        })
-    } catch (err) {
-        return res.status(500).json({
-            error: true,
-            message: err.message ?? 'Internal Server Error'
-        })
-    }
-},
-  detailUser: async(req, res) => {
-    try {
-      const user = await prisma.user.findFirst({
-          where: {
-              id: req.user.id
-          },
-          select: {
-              id: true,
-              name: true,
-              avatar: true,
-              email: true,
-              role: true,
-              address: true,
-              phone: true
-          }
-      })
+      const user = await prisma.user.count();
+      const category = await prisma.category.count();
+      const items = await prisma.items.count();
+      const transaction = await prisma.orderCart.count();
 
       return res.status(200).json({
-          success: true,
-          data: user
-      })
-  } catch (err) {
+        error: false,
+        user: user,
+        category: category,
+        items: items,
+        transaction: transaction,
+      });
+    } catch (err) {
       return res.status(500).json({
-          success: false,
-          message: err.message ?? 'Internal Server Error'
-      })
-  }
-  }
+        error: true,
+        message: err.message ?? "Internal Server Error",
+      });
+    }
+  },
+  detailUser: async (req, res) => {
+    try {
+      const user = await prisma.user.findFirst({
+        where: {
+          id: req.user.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          avatar: true,
+          email: true,
+          role: true,
+          address: true,
+          phone: true,
+        },
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: user,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message ?? "Internal Server Error",
+      });
+    }
+  },
 };
