@@ -51,7 +51,7 @@ model Items {
   name        String
   slug        String
   image       String?
-  price       Int
+  price       Int?
   address     String?
   positionlat Float?
   positionlng Float?

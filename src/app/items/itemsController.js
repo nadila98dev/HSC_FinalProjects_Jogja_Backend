@@ -97,8 +97,8 @@ const createItem = async (req, res) => {
     try {
         const body = req.body;
         const image = req.file
-        ? req.file.filename 
-        : "default.jpg"
+        ? `images/${req.file.filename}`
+        : "images/avatar/default.jpg";
 
         const createdItem = await prisma.items.create({
             data: {
