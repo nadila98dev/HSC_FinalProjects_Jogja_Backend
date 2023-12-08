@@ -21,7 +21,7 @@ const createOrder = async (req, res) => {
         item: {
           select: {
             id: true,
-            id_category: true,
+            categoryId: true,
             name: true,
             price: true,
             image: true,
@@ -126,22 +126,24 @@ const getAllOrders = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const orders = await prisma.orderCart.findMany({
-      where: {
-        userId,
-      },
-      select: {
-        id: true,
-        trxId: true,
-        totalCartPrice: true,
-        linkPayment: true,
-        paymentType: true,
-        detetimePayment: true,
-        statusPayment: true,
-        statusOrder: true,
-        cartData: true,
-      },
-    });
+   
+     const orders = await prisma.orderCart.findMany({
+        where: {
+          userId,
+        },
+        select: {
+          id: true,
+          trxId: true,
+          totalCartPrice: true,
+          linkPayment: true,
+          paymentType: true,
+          detetimePayment: true,
+          statusPayment: true,
+          statusOrder: true,
+          cartData: true,
+        },
+      });
+    
 
     const resOrders = orders.map((order) => {
       const convertDate = moment(order.detetimePayment)
@@ -171,25 +173,102 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+const getAllOrdersAdmin = async(req, res) => {
+  try {
+    let { limit , pageNumber, keyword } = req.query;
+    limit = limit ? parseInt(limit) : undefined;
+    pageNumber = pageNumber ? parseInt(pageNumber) : 1;
+    
+    let skip;
+    if (limit && pageNumber) {
+      skip = (pageNumber - 1) * limit;
+    }
+
+    const totalOrders = await prisma.orderCart.count();
+    const totalPages = limit ? Math.ceil(totalOrders / limit) : 1;
+
+    const itemsLength = await prisma.orderCart.findMany({
+      where:{
+        trxId:{
+          contains: keyword
+        }
+      }
+    });
+
+    const resLength = itemsLength.length
+
+    const items = await prisma.orderCart.findMany({
+      skip,
+      take: limit,
+      where:{
+        trxId:{
+          contains: keyword
+        }
+      }
+    });
+    // const response = items.map((item) => {
+    //   const convertDate = item.detetimePayment
+    //     ? moment(item.detetimePayment).tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss")
+    //     : null;
+
+    //   return {
+    //     id: item.id,
+    //     trxId: item.trxId,
+    //     totalCartPrice: item.totalCartPrice,
+    //     linkPayment: item.linkPayment,
+    //     paymentType: item.paymentType,
+    //     detetimePayment: convertDate,
+    //     statusPayment: item.statusPayment,
+    //     statusOrder: item.statusOrder,
+    //     cartData: JSON.parse(item.cartData),
+    //   };
+    // });
+
+    res
+      .status(StatusCodes.OK)
+      .json({
+        success: true,
+        message: "All categories successfully retrieved",
+        data: items,
+        totalItems: totalOrders,
+        limit,
+        totalPages,
+        currentPage:  parseInt(pageNumber),
+        currentItems: resLength
+      });
+  } catch (err) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({
+        success: false,
+        message: `Failed to retrieve categories: ${err.message}`,
+      });
+  }
+}
+
 const updateStatusOrder = async (req, res) => {
   const { id } = req.params;
   const { statusOrder } = req.body;
   try {
     const orders = await prisma.orderCart.update({
       where: {
-        id,
-        userId: req.user.id,
+        id: id,
       },
       data: {
         statusOrder: statusOrder,
       },
+      select:{
+        statusOrder: true
+      }
     });
 
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "Update Status Order Success",
+      data: orders
     });
   } catch (err) {
+    console.log(err)
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       error: err.message || "Internal Server Error",
@@ -199,25 +278,26 @@ const updateStatusOrder = async (req, res) => {
 
 const getOrderDetails = async (req, res) => {
   const { orderId } = req.params;
-  const userId = req.user.id;
+  // const userId = req.user.id;
 
   try {
     const orderDetails = await prisma.orderCart.findUnique({
       where: {
         id: orderId,
       },
-      select: {
-        id: true,
-        userId: true,
-        user: {
-          select: {
+      include:{
+        user:{
+          select :{
+            id: true,
             address: true,
             name: true,
             phone: true,
-          },
-        },
-      },
+          }
+        }
+      }
     });
+
+    
 
     if (!orderDetails) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -226,9 +306,13 @@ const getOrderDetails = async (req, res) => {
       });
     }
 
+    orderDetails.cartData = JSON.parse(orderDetails.cartData)
+    orderDetails.created_at = moment(orderDetails.created_at).tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss")
+    orderDetails.detetimePayment = orderDetails.paymentType ? moment(orderDetails.detetimePayment).tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss") : null
+
     res.status(StatusCodes.OK).json({
       success: true,
-      orderDetails,
+      data: orderDetails,
     });
   } catch (error) {
     console.error("Error getting order details:", error);
@@ -367,6 +451,7 @@ const webhook = async (req, res) => {
 module.exports = {
   createOrder,
   getAllOrders,
+  getAllOrdersAdmin,
   getOrderDetails,
   webhook,
   updateStatusOrder,

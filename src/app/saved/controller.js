@@ -11,7 +11,7 @@ const saveItemAsFavorite = async (req, res) => {
     const existingSavedItem = await prisma.saved.findFirst({
       where: {
         userId,
-        itemId,
+        itemsId: itemId,
       },
     });
 
@@ -43,7 +43,7 @@ const saveItemAsFavorite = async (req, res) => {
     const savedItem = await prisma.saved.create({
       data: {
         userId,
-        itemId,
+        itemsId: itemId,
       },
     });
 
@@ -103,7 +103,7 @@ const deleteSavedItem = async (req, res) => {
     const deletedItem = await prisma.saved.deleteMany({
       where: {
         userId,
-        itemId,
+        itemsId: itemId,
       },
     });
 

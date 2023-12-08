@@ -51,17 +51,17 @@ model Items {
   name        String
   slug        String
   image       String?
-  price       Int
-  address     String?
+  price       Int?
+  address     String?  @db.VarChar(300)
   positionlat Float?
   positionlng Float?
-  description String
+  description String   @db.Text
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
   //relation
   cart      Cart[]
-  category  Category    @relation(fields: [categoryId], references: [id])
+  category  Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   orderCart OrderCart[]
   saved     Saved[]
 }
@@ -78,7 +78,7 @@ model Cart {
   updated_at DateTime @updatedAt
 
   //relations
-  item Items @relation(fields: [itemsId], references: [id])
+  item Items @relation(fields: [itemsId], references: [id], onDelete: Cascade)
   user User  @relation(fields: [userId], references: [id])
 }
 

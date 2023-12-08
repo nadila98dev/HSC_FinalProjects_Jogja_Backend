@@ -37,7 +37,10 @@ const getallCategory = async (req, res) => {
       where:{
         name:{
           contains: keyword
-        }
+        },
+      },
+      orderBy:{
+        name: 'asc'
       }
     });
 
@@ -54,7 +57,7 @@ const getallCategory = async (req, res) => {
         currentItems: resLength
       });
   } catch (err) {
-    res
+    return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({
         success: false,
@@ -133,6 +136,7 @@ const updateCategory = async (req, res) => {
     const categoryId = Number(req.params.id);
 
     const images = req.file ? `images/${req.file.filename}` : body.image;
+    console.log(images)
 
     const findCategory = await prisma.category.findUnique({
       where: {

@@ -17,11 +17,7 @@ const orderRouter = require("./app/transaction/router");
 const cartRoute = require("./app/cart/Carts_route");
 const savedRouter = require("./app/saved/router");
 
-// app.use(cors({
-//   origin: 'http://localhost:5173', // Sesuaikan dengan domain frontend Anda
-//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//   credentials: true,
-// }));
+
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
