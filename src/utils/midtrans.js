@@ -47,12 +47,8 @@ const PaymentGateway = async (price, trxid, itemDetails, user) => {
     // },
   };
 
-  const res = await snap.createTransaction(parameter).then((transaction) => {
-    // transaction redirect_url
-    let redirectUrl = transaction.redirect_url;
-    console.log("redirectUrl:", redirectUrl);
-    return redirectUrl;
-  });
+  const res = await snap.createTransactionToken(parameter)
+  console.log(res)
   return { res, parameter };
 };
 

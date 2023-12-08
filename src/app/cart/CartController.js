@@ -56,6 +56,13 @@ const createCarts = async (req, res) => {
       id: itemsId
     }
   })
+  // console.log(findItem.price)
+  if( findItem === null || !findItem.price ){
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      success: false,
+      message: 'Request Not Valid'
+    })
+  }
 
 
     const sumPrice = quantity * findItem.price
