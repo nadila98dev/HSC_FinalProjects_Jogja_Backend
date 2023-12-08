@@ -40,7 +40,6 @@ app.use(`${version}/admin`, userRouter);
 app.use(`${version}/account`, accountRouter);
 
 // category
-
 app.use(`${version}/categories`, categoryRouter);
 
 // items
