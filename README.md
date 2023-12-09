@@ -3,22 +3,22 @@
 <h1>Endpoint</h1>
 <h3>#Auth</h3>
 <p>
-   
-
 1. Signup 
    method : POST
-  /api/v1/auth/signup
+   ```bash
+   /api/v1/auth/signup
+   ```
 2. Signin
    method : POST
-  /api/v1/auth/signin
+  ```bash
+   /api/v1/auth/signin
+   ```
 3. DetailUser
    method : GET
-  /api/v1/auth/detail
-4. Update User
-   method : PUT
-  /api/v1/auth/
+  ```bash
+   /api/v1/auth/detail
+   ```
 </p>
-
 
 <h3>#Category</h3>
 <p>
