@@ -15,7 +15,8 @@ const getCarts = async (req, res) => {
           select:{
             id: true,
             name: true,
-            price: true
+            price: true,
+            image: true
           }
         }
       },
@@ -63,8 +64,6 @@ const createCarts = async (req, res) => {
       message: 'Request Not Valid'
     })
   }
-
-
     const sumPrice = quantity * findItem.price
 
     if (findCartItem) {

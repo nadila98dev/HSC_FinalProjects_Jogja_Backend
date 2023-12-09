@@ -65,9 +65,18 @@ const getAllItems = async (req, res) => {
         skip,
         take: limit,
         where: {
-          name: {
-            contains: keyword
+         OR:[
+          {
+            name: {
+              contains: keyword
+            },
           },
+          {
+            slug:{
+              contains: keyword
+            }
+          }
+         ]
         },
         include: {
           category: {
