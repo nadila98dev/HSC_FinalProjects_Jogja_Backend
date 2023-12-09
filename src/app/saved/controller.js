@@ -74,6 +74,7 @@ const getSavedItemsByUserId = async (req, res) => {
       select: {
         item: {
           select: {
+            id: true,
             image: true,
             name: true,
             description: true,

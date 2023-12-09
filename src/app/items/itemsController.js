@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 // GET METHOD
 const getAllItems = async (req, res) => {
   try {
-    let { limit, pageNumber, keyword } = req.query;
+    let { limit, pageNumber, keyword, categoryId } = req.query;
     limit = limit ? parseInt(limit) : undefined;
     pageNumber = pageNumber ? parseInt(pageNumber) : 1;
 
@@ -27,7 +27,9 @@ const getAllItems = async (req, res) => {
         name: {
           contains: keyword,
         },
+        
       },
+      
     });
     const resLength = itemsLength.length;
 
@@ -38,6 +40,7 @@ const getAllItems = async (req, res) => {
         name: {
           contains: keyword,
         },
+        categoryId: parseInt(categoryId)  
       },
       include: {
         category: {
