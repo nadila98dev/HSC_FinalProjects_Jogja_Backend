@@ -27,35 +27,66 @@ const getAllItems = async (req, res) => {
         name: {
           contains: keyword,
         },
-        
       },
-      
     });
     const resLength = itemsLength.length;
 
-    const response = await prisma.items.findMany({
-      skip,
-      take: limit,
-      where: {
-        name: {
-          contains: keyword,
+    const categoryIdValue = categoryId ? parseInt(categoryId, 10) : null;
+
+    let response;
+
+    if(categoryId){
+       response = await prisma.items.findMany({
+        skip,
+        take: limit,
+        where: {
+          name: {
+            contains: keyword || "", 
+          },
+  
+          categoryId: categoryIdValue,
         },
-        categoryId: parseInt(categoryId)  
-      },
-      include: {
-        category: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              image: true,
+            },
           },
         },
-      },
-      orderBy:{
-        created_at:'desc'
-      }
-    });
+        orderBy: {
+          created_at: "desc",
+        },
+      });
+    } else {
+      response = await prisma.items.findMany({
+        skip,
+        take: limit,
+        where: {
+          name: {
+            contains: keyword
+          },
+        },
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              image: true,
+            },
+          },
+        },
+        orderBy: {
+          created_at: "desc",
+        },
+      });
+  
+    }
 
+    
     res.status(StatusCodes.OK).json({
       success: true,
       message: "Items retrieved sucessfully",
@@ -86,7 +117,9 @@ const getItembyId = async (req, res) => {
         category: true,
       },
     });
-    response.created_at = moment(response.created_at).tz('Asia/Jakarta').format("YYYY-MM-DD HH:mm:ss")
+    response.created_at = moment(response.created_at)
+      .tz("Asia/Jakarta")
+      .format("YYYY-MM-DD HH:mm:ss");
 
     if (!response) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -141,7 +174,6 @@ const createItem = async (req, res) => {
     });
   }
 };
-
 
 // PUT METHOD
 const updateItem = async (req, res) => {
@@ -246,7 +278,7 @@ const deleteItem = async (req, res) => {
       data: deletedItem,
     });
   } catch (err) {
-    console.log(err)
+    console.log(err);
     res.status(StatusCodes.BAD_REQUEST).json({
       success: false,
       message: `Failed to delete item: ${err.message}`,
