@@ -7,7 +7,10 @@ const router = express.Router()
 
 router.get('/', getAllItems)
 
+// router.get('/:slug', detailItems);
+
 router.get('/:id', getItembyId)
+
 
 router.post('/', upload.single('image'),authenticateAdmin, createItem)
 
