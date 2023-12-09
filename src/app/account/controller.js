@@ -45,7 +45,9 @@ const updatePhoneNumber = async (req, res, next) => {
 const uploadAvatar = async (req, res, next) => {
   try {
     const userId = req.user.id;
-
+    const images = req.file
+      ? `images/${req.file.filename}`
+      : "images/avatar/default.jpg";
     if (!req.file) {
       return res
         .status(StatusCodes.BAD_REQUEST)
@@ -54,7 +56,7 @@ const uploadAvatar = async (req, res, next) => {
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: { avatar: req.file.path },
+      data: { avatar: images },
     });
 
     res

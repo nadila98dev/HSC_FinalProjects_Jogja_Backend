@@ -38,7 +38,7 @@ const PaymentGateway = async (price, trxid, itemDetails, user) => {
       "other_qris",
     ],
     callbacks: {
-      finish: "https://jogja-istemewa.vercel.app/",
+      finish: "https://jogja-istemewa.vercel.app/transaction",
     },
     // expiry: {
     //     "start_time": "2025-12-20 18:11:08 +0700",
