@@ -20,8 +20,6 @@ const getAllItems = async (req, res) => {
       skip = (pageNumber - 1) * limit;
     }
 
-  
-
     const totalItems = await prisma.items.count();
     const totalPages = limit ? Math.ceil(totalItems / limit) : 1;
 
